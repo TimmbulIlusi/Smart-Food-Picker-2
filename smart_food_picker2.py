@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("Smart Food Picker 🍽️")
-st.markdown("### 🧠 Sistem Rekomendasi Makanan Berbasis Rule-Based")
+st.markdown("### 🥗 Sistem Rekomendasi Makanan Sesuai dengan Kebutuhan Anda")
 st.write("Pilih nutrisi, budget, dan fakta gizi untuk mendapatkan rekomendasi terbaik.")
 
 # ================= INPUT =================
@@ -17,7 +17,7 @@ fakta_dipilih = st.multiselect(
     ["Protein", "Vitamin B", "Kalsium", "Zat Besi", "Serat", "Omega-3"]
 )
 
-# ================= FAKTA (DATA MAKANAN) =================
+# ================= FAKTA =================
 makanan = [
     {"nama": "Tempe", "kategori": "Protein", "harga": 5000, "berat": "±250g",
      "gizi": ["Protein", "Zat Besi", "Serat"]},
@@ -79,16 +79,14 @@ if st.button("Dapatkan Rekomendasi"):
         st.success("💡 Pilihan yang tersedia:")
 
         ditemukan = False
-        terbaik = None
+        terbaik = None  # 🔥 penting
 
         for item in makanan:
 
-            # ================= RULE 1 =================
-            # IF kategori sesuai DAN budget cukup
+            # RULE 1
             if nutrisi == item["kategori"] and budget >= item["harga"]:
 
-                # ================= RULE 2 =================
-                # IF fakta dipilih → harus cocok semua
+                # RULE 2
                 cocok = True
                 for f in fakta_dipilih:
                     if f not in item["gizi"]:
@@ -100,24 +98,47 @@ if st.button("Dapatkan Rekomendasi"):
                     st.write(f"🍽️ {item['nama']} (Rp{item['harga']} / {item['berat']})")
                     st.write(f"👉 Kandungan: {', '.join(item['gizi']) if item['gizi'] else 'Umum'}")
 
-                    # ================= RULE 3 =================
-                    # cari yang paling mahal dalam budget (optimal)
+                    # RULE 3 (pemilihan terbaik)
                     if terbaik is None or item["harga"] > terbaik["harga"]:
                         terbaik = item
 
-        # ================= RULE 4 =================
+        # RULE 4
         if not ditemukan:
             st.warning("⚠️ Tidak ada makanan yang sesuai dengan pilihan Anda")
 
-        # ================= RULE 5 =================
+        # ================= REKOMENDASI UTAMA + ALASAN =================
         if terbaik:
             st.markdown("---")
             st.success(f"⭐ Rekomendasi Utama: {terbaik['nama']}")
-            st.write("👉 Dipilih untuk memaksimalkan budget Anda")
 
-        # ================= RULE 6 =================
+            alasan = []
+
+            # alasan 1
+            alasan.append(f"✔ Sesuai kebutuhan nutrisi: {nutrisi}")
+
+            # alasan 2
+            alasan.append(f"✔ Harga sesuai budget (Rp{terbaik['harga']})")
+
+            # alasan 3
+            if fakta_dipilih:
+                cocok = [f for f in fakta_dipilih if f in terbaik["gizi"]]
+                if cocok:
+                    alasan.append(f"✔ Mengandung gizi yang dipilih: {', '.join(cocok)}")
+
+            # alasan 4
+            alasan.append("✔ Memaksimalkan penggunaan budget")
+
+            # alasan 5
+            if terbaik["gizi"]:
+                alasan.append(f"✔ Kandungan lengkap: {', '.join(terbaik['gizi'])}")
+
+            st.write("📌 Alasan rekomendasi:")
+            for a in alasan:
+                st.write(a)
+
+        # RULE 5
         if budget > 50000:
             st.info("💡 Budget besar memberi lebih banyak variasi makanan")
 
 st.markdown("---")
-st.caption("Smart Food Picker")
+st.caption("Smart Food Picker | Eat Healthy, Spend Smartly!🌽")
